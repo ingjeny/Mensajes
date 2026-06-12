@@ -3,6 +3,10 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
+// Evitar que errores internos de puppeteer/whatsapp-web.js tiren el proceso
+process.on('uncaughtException',  err => console.error('[uncaughtException]', err.message));
+process.on('unhandledRejection', err => console.error('[unhandledRejection]', err?.message ?? err));
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -15,6 +19,7 @@ app.use(express.json());
 app.use('/uploads', express.static(uploadsDir));
 
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/profiles', require('./routes/profiles'));
 app.use('/api/whatsapp', require('./routes/whatsapp'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));

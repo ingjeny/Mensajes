@@ -1,3 +1,8 @@
 backend/src/sessions/
 sessions/
 *.log
+node_modules/
+backend/.env
+backend/data/
+backend/.wwebjs_cache/
+backend/uploads/

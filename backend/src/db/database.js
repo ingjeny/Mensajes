@@ -24,6 +24,30 @@ db.serialize(() => {
     UNIQUE(company_id, username),
     FOREIGN KEY(company_id) REFERENCES companies(id)
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS business_profiles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    color TEXT DEFAULT '#0d9488',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(company_id) REFERENCES companies(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS sent_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER NOT NULL,
+    recipient_jid TEXT NOT NULL,
+    recipient_name TEXT NOT NULL,
+    recipient_type TEXT NOT NULL DEFAULT 'group',
+    message TEXT DEFAULT '',
+    images TEXT DEFAULT '[]',
+    profile_id INTEGER,
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(company_id) REFERENCES companies(id),
+    FOREIGN KEY(profile_id) REFERENCES business_profiles(id)
+  )`);
 });
 
 // Helper: promisified get / run / all
@@ -33,5 +57,8 @@ const dbGet = (sql, params = []) => new Promise((res, rej) =>
 const dbRun = (sql, params = []) => new Promise((res, rej) =>
   db.run(sql, params, function (err) { err ? rej(err) : res({ lastID: this.lastID, changes: this.changes }); })
 );
+const dbAll = (sql, params = []) => new Promise((res, rej) =>
+  db.all(sql, params, (err, rows) => err ? rej(err) : res(rows))
+);
 
-module.exports = { db, dbGet, dbRun };
+module.exports = { db, dbGet, dbRun, dbAll };
